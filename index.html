@@ -79,21 +79,20 @@
         function downloadImage() {
     const dataURL = canvas.toDataURL("image/png");
 
-    // Create an image element for users to manually save
-    const img = document.createElement("img");
-    img.src = dataURL;
-    img.style = "max-width: 100%; display: block; margin: 20px auto;";
-
-    // Clear previous download link and add new one
-    const downloadContainer = document.getElementById("downloadContainer");
-    downloadContainer.innerHTML = "";
-    downloadContainer.appendChild(img);
-
-    // Add instructions for iPhone users
-    const instructions = document.createElement("p");
-    instructions.innerText = "Long press the image and select 'Save Image' to download.";
-    instructions.style = "text-align: center; font-size: 16px; margin-top: 10px;";
-    downloadContainer.appendChild(instructions);
+    // Convert data URL to a Blob
+    fetch(dataURL)
+        .then(res => res.blob())
+        .then(blob => {
+            const link = document.createElement("a");
+            const url = URL.createObjectURL(blob);
+            link.href = url;
+            link.download = "final_image.png";
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+        })
+        .catch(error => console.error("Error downloading image:", error));
 }
     </script>
 </body>
