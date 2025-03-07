@@ -77,11 +77,23 @@
         });
         
         function downloadImage() {
-    const link = document.createElement('a');
-    link.href = canvas.toDataURL('image/png');
-    link.target = "_blank"; // Opens in a new tab
-    link.download = 'final_image.png';
-    link.click();
+    const dataURL = canvas.toDataURL("image/png");
+
+    // Create an image element for users to manually save
+    const img = document.createElement("img");
+    img.src = dataURL;
+    img.style = "max-width: 100%; display: block; margin: 20px auto;";
+
+    // Clear previous download link and add new one
+    const downloadContainer = document.getElementById("downloadContainer");
+    downloadContainer.innerHTML = "";
+    downloadContainer.appendChild(img);
+
+    // Add instructions for iPhone users
+    const instructions = document.createElement("p");
+    instructions.innerText = "Long press the image and select 'Save Image' to download.";
+    instructions.style = "text-align: center; font-size: 16px; margin-top: 10px;";
+    downloadContainer.appendChild(instructions);
 }
     </script>
 </body>
