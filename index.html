@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Template Uploader</title>
+    <style>
+        body { text-align: center; font-family: Arial, sans-serif; }
+        canvas { max-width: 100%; border: 2px solid #000; }
+    </style>
+</head>
+<body>
+    <h2>Upload Your Picture</h2>
+    <input type="file" id="upload" accept="image/*">
+    <br><br>
+    <canvas id="canvas" width="1080" height="1350"></canvas>
+    <br>
+    <button onclick="downloadImage()">Download</button>
+    
+    <script>
+        const templateSrc = 'template.jpg'; // Replace with your template image URL
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        
+        const template = new Image();
+        template.src = templateSrc;
+        
+        template.onload = () => {
+            ctx.drawImage(template, 0, 0, canvas.width, canvas.height);
+        };
+        
+        document.getElementById('upload').addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const uploadedImage = new Image();
+                    uploadedImage.src = e.target.result;
+                    uploadedImage.onload = function() {
+                        ctx.clearRect(0, 0, canvas.width, canvas.height);
+                        ctx.drawImage(template, 0, 0, canvas.width, canvas.height);
+                        
+                        // Define the exact frame position & size (Adjusted for accuracy)
+                        const frameX = 280.46;
+                        const frameY = 262.84;
+                        const frameWidth = 521.81;
+                        const frameHeight = 637.06;
+                        
+                        // Create a clipping mask for the frame shape
+                        ctx.save();
+                        ctx.beginPath();
+                        ctx.moveTo(280.46, 262.84); // Adjusted for accurate frame edges
+                        ctx.arcTo(802.27, 262.84, 802.27, 899.9, 50);
+                        ctx.arcTo(802.27, 899.9, 280.46, 899.9, 50);
+                        ctx.arcTo(280.46, 899.9, 280.46, 262.84, 50);
+                        ctx.arcTo(280.46, 262.84, 802.27, 262.84, 50);
+                        ctx.closePath();
+                        ctx.clip();
+                        
+                        // Resize & center the uploaded image
+                        const aspectRatio = uploadedImage.width / uploadedImage.height;
+                        let newWidth = frameWidth;
+                        let newHeight = frameWidth / aspectRatio;
+                        if (newHeight < frameHeight) {
+                            newHeight = frameHeight;
+                            newWidth = frameHeight * aspectRatio;
+                        }
+                        const offsetX = frameX + (frameWidth - newWidth) / 2;
+                        const offsetY = frameY + (frameHeight - newHeight) / 2;
+                        ctx.drawImage(uploadedImage, offsetX, offsetY, newWidth, newHeight);
+                        
+                        ctx.restore(); // Remove clip to prevent affecting future drawings
+                    };
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+        
+        function downloadImage() {
+            const link = document.createElement('a');
+            link.download = 'final_image.png';
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+        }
+    </script>
+</body>
+</html>
