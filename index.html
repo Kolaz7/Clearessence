@@ -11,24 +11,40 @@
 </head>
 <body>
     <h2>Upload Your Picture</h2>
+    
+    <!-- Template Selection Dropdown -->
+    <label for="templateSelect">Choose a template:</label>
+    <select id="templateSelect">
+        <option value="template1.jpg">Template 1</option>
+        <option value="template2.jpg">Template 2</option>
+        <option value="template3.jpg">Template 3</option>
+    </select>
+    <br><br>
+    
     <input type="file" id="upload" accept="image/*">
     <br><br>
     <canvas id="canvas" width="1080" height="1350"></canvas>
     <br>
     <button onclick="downloadImage()">Download</button>
+    <div id="downloadContainer"></div>
     
     <script>
-        const templateSrc = 'template.jpg'; // Replace with your template image URL
         const canvas = document.getElementById('canvas');
         const ctx = canvas.getContext('2d');
-        
-        const template = new Image();
-        template.src = templateSrc;
-        
-        template.onload = () => {
-            ctx.drawImage(template, 0, 0, canvas.width, canvas.height);
-        };
-        
+        let template = new Image();
+        const templateSelect = document.getElementById('templateSelect');
+
+        function loadTemplate() {
+            template.src = templateSelect.value;
+            template.onload = () => {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.drawImage(template, 0, 0, canvas.width, canvas.height);
+            };
+        }
+
+        templateSelect.addEventListener('change', loadTemplate);
+        loadTemplate(); // Load default template
+
         document.getElementById('upload').addEventListener('change', function(event) {
             const file = event.target.files[0];
             if (file) {
@@ -49,7 +65,7 @@
                         // Create a clipping mask for the frame shape
                         ctx.save();
                         ctx.beginPath();
-                        ctx.moveTo(280.46, 262.84); // Adjusted for accurate frame edges
+                        ctx.moveTo(280.46, 262.84);
                         ctx.arcTo(802.27, 262.84, 802.27, 899.9, 50);
                         ctx.arcTo(802.27, 899.9, 280.46, 899.9, 50);
                         ctx.arcTo(280.46, 899.9, 280.46, 262.84, 50);
@@ -77,23 +93,21 @@
         });
         
         function downloadImage() {
-    const dataURL = canvas.toDataURL("image/png");
-
-    // Convert data URL to a Blob
-    fetch(dataURL)
-        .then(res => res.blob())
-        .then(blob => {
-            const link = document.createElement("a");
-            const url = URL.createObjectURL(blob);
-            link.href = url;
-            link.download = "final_image.png";
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            URL.revokeObjectURL(url);
-        })
-        .catch(error => console.error("Error downloading image:", error));
-}
+            const dataURL = canvas.toDataURL("image/png");
+            fetch(dataURL)
+                .then(res => res.blob())
+                .then(blob => {
+                    const link = document.createElement("a");
+                    const url = URL.createObjectURL(blob);
+                    link.href = url;
+                    link.download = "final_image.png";
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    URL.revokeObjectURL(url);
+                })
+                .catch(error => console.error("Error downloading image:", error));
+        }
     </script>
 </body>
 </html>
